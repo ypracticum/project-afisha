@@ -13,6 +13,10 @@ import { SelectSessionScreen } from '@/components/view/screen/SelectSession';
 import { SessionController } from '@/components/controller/Session';
 import { SelectPlacesScreen } from '@/components/view/screen/SelectPlaces';
 import { PlacesController } from '@/components/controller/Places';
+import { ModalController } from '@/components/controller/Modal';
+import { SuccessScreen } from '@/components/view/screen/Success';
+import { OrderController } from '@/components/controller/Order';
+import { OrderFormScreen } from '@/components/view/screen/OrderForm';
 import { BasketController } from '@/components/controller/Basket';
 import { BasketScreen } from '@/components/view/screen/Basket';
 import { ModalChange } from '@/types/components/model/AppStateEmitter';
@@ -28,6 +32,10 @@ const modal = {
 		new PlacesController(app.model)
 	),
 	[AppStateModals.basket]: new BasketScreen(new BasketController(app.model)),
+	[AppStateModals.contacts]: new OrderFormScreen(
+		new OrderController(app.model)
+	),
+	[AppStateModals.success]: new SuccessScreen(new ModalController(app.model)),
 };
 
 app.on(AppStateChanges.movies, () => {
@@ -41,9 +49,16 @@ app.on(AppStateChanges.selectedMovie, () => {
 app.on(AppStateChanges.modal, ({ previous, current }: ModalChange) => {
 	main.page.isLocked = current !== AppStateModals.none;
 	if (previous !== AppStateModals.none) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		modal[previous].render({ isActive: false });
+	}
+});
+
+app.on(AppStateChanges.modalMessage, () => {
+	if (app.model.openedModal !== AppStateModals.none) {
+		modal[app.model.openedModal].render({
+			message: app.model.modalMessage,
+			isError: app.model.isError,
+		});
 	}
 });
 
@@ -114,6 +129,33 @@ app.on(AppStateModals.basket, () => {
 		}),
 		total: app.model.formatCurrency(app.model.basketTotal),
 		isDisabled: app.model.basket.size === 0,
+		isActive: true,
+	});
+});
+
+app.on(AppStateModals.contacts, () => {
+	modal[AppStateModals.contacts].render({
+		header: {
+			title: SETTINGS.orderModal.headerTitle,
+			description: app.model.formatMovieDescription(app.model.getBasketMovie()),
+		},
+		contacts: app.model.contacts,
+		total: app.model.formatCurrency(app.model.basketTotal),
+		isDisabled: !app.model.contacts.email && !app.model.contacts.phone,
+		isActive: true,
+	});
+});
+
+app.on(AppStateChanges.order, () => {
+	modal[AppStateModals.contacts].render({
+		contacts: app.model.contacts,
+		isDisabled: !app.model.contacts.email && !app.model.contacts.phone,
+	});
+});
+
+app.on(AppStateModals.success, () => {
+	modal[AppStateModals.success].render({
+		content: SETTINGS.successModal,
 		isActive: true,
 	});
 });
