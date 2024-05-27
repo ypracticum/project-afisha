@@ -13,6 +13,8 @@ import { SelectSessionScreen } from '@/components/view/screen/SelectSession';
 import { SessionController } from '@/components/controller/Session';
 import { SelectPlacesScreen } from '@/components/view/screen/SelectPlaces';
 import { PlacesController } from '@/components/controller/Places';
+import { BasketController } from '@/components/controller/Basket';
+import { BasketScreen } from '@/components/view/screen/Basket';
 import { ModalChange } from '@/types/components/model/AppStateEmitter';
 
 const api = new FilmAPI(CDN_URL, API_URL);
@@ -25,6 +27,7 @@ const modal = {
 	[AppStateModals.place]: new SelectPlacesScreen(
 		new PlacesController(app.model)
 	),
+	[AppStateModals.basket]: new BasketScreen(new BasketController(app.model)),
 };
 
 app.on(AppStateChanges.movies, () => {
@@ -38,6 +41,7 @@ app.on(AppStateChanges.selectedMovie, () => {
 app.on(AppStateChanges.modal, ({ previous, current }: ModalChange) => {
 	main.page.isLocked = current !== AppStateModals.none;
 	if (previous !== AppStateModals.none) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		modal[previous].render({ isActive: false });
 	}
@@ -89,6 +93,28 @@ app.on(AppStateChanges.basket, () => {
 			selected: Array.from(app.model.basket.values()),
 		},
 		isDisabled: app.model.basket.size === 0,
+	});
+	modal[AppStateModals.basket].tickets = Array.from(
+		app.model.basket.values()
+	).map((ticket) => {
+		return app.model.formatTicketDescription(ticket);
+	});
+});
+
+app.on(AppStateModals.basket, () => {
+	modal[AppStateModals.basket].render({
+		header: {
+			title: SETTINGS.basketModal.headerTitle,
+			description: app.model.basket.size
+				? app.model.formatMovieDescription(app.model.getBasketMovie())
+				: '',
+		},
+		tickets: Array.from(app.model.basket.values()).map((ticket) => {
+			return app.model.formatTicketDescription(ticket);
+		}),
+		total: app.model.formatCurrency(app.model.basketTotal),
+		isDisabled: app.model.basket.size === 0,
+		isActive: true,
 	});
 });
 
