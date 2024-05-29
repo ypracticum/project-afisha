@@ -73,4 +73,8 @@ export class MainScreen extends Screen<MainData, MainSettings> {
 		this.hero.cover = value.cover;
 		this.gallery.setActiveItem(value.id);
 	}
+
+	set isLocked(value: boolean) {
+		this.page.isLocked = value;
+	}
 }

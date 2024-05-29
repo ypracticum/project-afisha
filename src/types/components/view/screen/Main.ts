@@ -10,6 +10,7 @@ export interface MainData {
 	counter: number;
 	items: CardData[];
 	selected: FilmItem;
+	isLocked: boolean;
 }
 
 export interface MainSettings {
