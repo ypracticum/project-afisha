@@ -13,6 +13,10 @@ export interface IViewConstructor<T, S> {
 	new (root: HTMLElement, settings: S): IView<T>;
 }
 
+export interface IScreenConstructor<T, S> {
+	new (settings: S): IView<T, S>;
+}
+
 // Чтобы события настраивались единообразно, пропишем их здесь
 
 // Настройки для кликабельного отображения (кнопки, карточки...)
