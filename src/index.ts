@@ -10,6 +10,8 @@ import { SessionPresenter } from '@/components/presenter/Session';
 import { SelectSessionScreen } from '@/components/view/screen/SelectSession';
 import { PlacePresenter } from '@/components/presenter/Place';
 import { SelectPlacesScreen } from '@/components/view/screen/SelectPlaces';
+import { BasketPresenter } from '@/components/presenter/Basket';
+import { BasketScreen } from '@/components/view/screen/Basket';
 
 // Initialize the application
 const api = new FilmAPI(CDN_URL, API_URL);
@@ -18,6 +20,7 @@ const app = new AppStateEmitter(api, SETTINGS.appState, AppStateModel);
 new MainPresenter(MainScreen, app);
 new SessionPresenter(SelectSessionScreen, app);
 new PlacePresenter(SelectPlacesScreen, app);
+new BasketPresenter(BasketScreen, app);
 
 app.model
 	.loadMovies()
