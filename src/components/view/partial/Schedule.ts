@@ -77,8 +77,8 @@ export class ScheduleView extends View<ScheduleData, ScheduleSettings> {
 	}
 
 	render(data: ScheduleData) {
-		this.sessions = data.sessions;
-		this.selected = data.selected;
+		if (data.sessions) this.sessions = data.sessions;
+		if (data.selected && this._times) this.selected = data.selected;
 		return this.element;
 	}
 
