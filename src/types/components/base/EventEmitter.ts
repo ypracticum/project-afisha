@@ -6,7 +6,10 @@ export type HandlersMap<Events, K extends keyof Events = keyof Events> = Events 
 	? Map<K, Set<EventHandler<Events[K]>>>
 	: never;
 
-
+export type AllEventData<Events> = {
+	event: keyof Events;
+	data: Events[keyof Events];
+}
 
 export interface Emitter<Events> {
 	on<E extends keyof Events>(eventName: E, handler: EventHandler<Events[E]>): void;
